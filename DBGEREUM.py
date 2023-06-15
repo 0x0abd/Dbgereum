@@ -1992,7 +1992,10 @@ class Dbgereum:
             try:
                 shift = int(self.stack.pop(), 16)
                 value = int(self.stack.pop(), 16)
-                self.stack.append(hex(value << shift)[2:])
+                result = value << shift
+                # Make sure we are still in 32 byte range
+                result &= 2**256 - 1 # 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                self.stack.append(hex(result)[2:])
                 self.ip += 1
             except:
                 print("[SHL] Smth went wrong :( - Popped value from empty stack...")
