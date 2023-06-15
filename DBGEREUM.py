@@ -2035,11 +2035,11 @@ class Dbgereum:
             try:
                 offset = int(self.stack.pop(), 16)
                 length = int(self.stack.pop(), 16)
-                res = self.bytecode[offset:offset + length]
+                res = bytes(int(byte, 16) for byte in self.memory[offset:offset + length])
                 k = keccak.new(digest_bits=256)
                 k.update(res)
                 res = k.hexdigest()
-                self.stack.append(hex(res)[2:])
+                self.stack.append(res)
                 self.ip += 1
             except:
                 print("[SHA3] Smth went wrong :( - Popped value from empty stack...")
