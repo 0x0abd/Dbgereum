@@ -2097,7 +2097,7 @@ class Dbgereum:
                         self.stack.append(self.storage[i].split(":")[1])
                         break
                 else:
-                    self.stack.append(0)
+                    self.stack.append(hex(0)[2:])
                 self.ip += 1
             except:
                 print("[SLOAD] Smth went wrong :( - Popped value from empty stack...")
