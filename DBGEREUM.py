@@ -2092,12 +2092,13 @@ class Dbgereum:
         elif command == 0x54:
             try:
                 key = int(self.stack.pop(), 16)
-                try:
-                    self.stack.append(self.storage[key])
-                    self.ip += 1
-                except:
-                    print("[SLOAD] key-value query doesn't exist. Implement storage parsing before exec.")
-                    exit()
+                for i in range(len(self.storage) - 1, 0, -1):
+                    if int(self.storage[i].split(":")[0], 16) == key:
+                        self.stack.append(self.storage[i].split(":")[1])
+                        break
+                else:
+                    self.stack.append(hex(0)[2:])
+                self.ip += 1
             except:
                 print("[SLOAD] Smth went wrong :( - Popped value from empty stack...")
                 exit()
