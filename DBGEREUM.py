@@ -2095,7 +2095,7 @@ class Dbgereum:
                 for i in range(len(self.storage) - 1, 0, -1):
                     if int(self.storage[i].split(":")[0], 16) == key:
                         self.stack.append(self.storage[i].split(":")[1])
-                    break
+                        break
                 else:
                     self.stack.append(0)
                 self.ip += 1
