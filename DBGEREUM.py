@@ -1992,7 +1992,10 @@ class Dbgereum:
             try:
                 shift = int(self.stack.pop(), 16)
                 value = int(self.stack.pop(), 16)
-                self.stack.append(hex(value << shift)[2:])
+                result = value << shift
+                # Make sure we are still in 32 byte range
+                result &= 2**256 - 1 # 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+                self.stack.append(hex(result)[2:])
                 self.ip += 1
             except:
                 print("[SHL] Smth went wrong :( - Popped value from empty stack...")
@@ -2032,11 +2035,11 @@ class Dbgereum:
             try:
                 offset = int(self.stack.pop(), 16)
                 length = int(self.stack.pop(), 16)
-                res = self.bytecode[offset:offset + length]
+                res = bytes(int(byte, 16) for byte in self.memory[offset:offset + length])
                 k = keccak.new(digest_bits=256)
                 k.update(res)
                 res = k.hexdigest()
-                self.stack.append(hex(res)[2:])
+                self.stack.append(res)
                 self.ip += 1
             except:
                 print("[SHA3] Smth went wrong :( - Popped value from empty stack...")
@@ -2089,12 +2092,13 @@ class Dbgereum:
         elif command == 0x54:
             try:
                 key = int(self.stack.pop(), 16)
-                try:
-                    self.stack.append(self.storage[key])
-                    self.ip += 1
-                except:
-                    print("[SLOAD] key-value query doesn't exist. Implement storage parsing before exec.")
-                    exit()
+                for i in range(len(self.storage) - 1, 0, -1):
+                    if int(self.storage[i].split(":")[0], 16) == key:
+                        self.stack.append(self.storage[i].split(":")[1])
+                        break
+                else:
+                    self.stack.append(hex(0)[2:])
+                self.ip += 1
             except:
                 print("[SLOAD] Smth went wrong :( - Popped value from empty stack...")
                 exit()
